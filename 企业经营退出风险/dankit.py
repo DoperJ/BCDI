@@ -7,7 +7,10 @@ Created on Mon Oct 16 22:06:09 2017
 """
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+
 from sklearn.metrics import accuracy_score
+from sklearn.decomposition import PCA
 
 def clfScore(clf, X_test, y_test):
     y_pred = clf.predict(X_test)
@@ -25,4 +28,30 @@ def answer(clf, X_answer, X_ID):
     prediction['EID'] = X_ID
     prediction['FORTARGET'] = y_answer
     prediction['PROB'] = y_answer_prob
+    prediction.set_index('EID', inplace=True)
     return prediction
+
+def pca_ratio_curve(data, max_components, note_components=None):
+    pca = PCA(n_components=max_components)
+    data_compressed = pca.fit_transform(data)
+    variances_sum = pca.explained_variance_ratio_.cumsum()
+    plt.plot(np.arange(1,max_components+1),variances_sum)
+    plt.xticks(np.arange(1,max_components+1))
+    plt.xlabel('numbers of features to keep')
+    plt.ylabel('ratio of information remains')
+    if note_components:
+        plt.annotate('Point(%d,%.2f)' % (note_components,
+                     variances_sum[note_components-1]),
+                    xy=(note_components, variances_sum[note_components-1]),
+                    xytext=(note_components, variances_sum[note_components//2]),
+                    fontsize=15,
+                    arrowprops=dict(arrowstyle="->"))
+    plt.show()
+    return data_compressed
+
+def compress(data, n, prefix):
+    pca = PCA(n_components=n)
+    data_compressed = pca.fit_transform(data)
+    data_compressed_df = pd.DataFrame(data_compressed, 
+                 columns=list([prefix+str(x) for x in range(1,pca.n_components_+1)]))
+    return data_compressed_df

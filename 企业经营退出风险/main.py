@@ -45,7 +45,7 @@ hy_dummies = pd.get_dummies(entbase['HY'])
 ##pca = PCA(n_components=21)
 ##hy_compressed = pca.fit_transform(hy_dummies)
 ##for i in range(1,21):
-##    variances.append(pca.explained_variance_.sum())
+##    variances.append(pca.explained_variance_[:i].sum())
 #plt.plot(np.arange(1,21),variances)
 #plt.xticks(np.arange(1,21))
 #plt.xlabel('numbers of features to keep')
@@ -54,17 +54,17 @@ hy_dummies = pd.get_dummies(entbase['HY'])
 #            xytext=(+10, +0.7), fontsize=15,
 #            arrowprops=dict(arrowstyle="->"))
 #plt.show()
-pca = PCA(n_components=10)
+pca = PCA(n_components=15)
 hy_compressed = pca.fit_transform(hy_dummies)
 hy_compressed_df = pd.DataFrame(hy_compressed, 
-             columns=list(['hy'+str(x) for x in range(1,11)]))
+             columns=list(['hy'+str(x) for x in range(1,16)]))
 entbase = entbase.join(hy_compressed_df)
 
 #ZCZB
-imp_nan = Imputer(missing_values='NaN', strategy='most_frequent', axis=0)
+imp_nan = Imputer(missing_values='NaN', strategy='median', axis=0)
 imp_nan.fit(entbase.loc[:,['ZCZB']])
 entbase.loc[:,['ZCZB']] = imp_nan.transform(entbase.loc[:,['ZCZB']])
-imp_0 = Imputer(missing_values=0, strategy='most_frequent', axis=0)
+imp_0 = Imputer(missing_values=0, strategy='median', axis=0)
 imp_0.fit(entbase.loc[:,['ZCZB']])
 entbase.loc[:,['ZCZB']] = imp_0.transform(entbase.loc[:,['ZCZB']])
 scaler = StandardScaler()
@@ -86,45 +86,8 @@ X_answer = pd.merge(evaluation, entbase, how='left', on='EID')
 #g.set_xticklabels(step=5)
 #X_train['RGYEAR'].describe()
 
-y_train = X_train['TARGET']
-X_ID = X_answer['EID']
-X_train.drop(['EID','TARGET','RGYEAR','HY','ETYPE'], axis=1, inplace=True)
-X_answer.drop(['EID','RGYEAR','HY','ETYPE'], axis=1, inplace=True)
+X_train.drop(['RGYEAR','HY','ETYPE'], axis=1, inplace=True)
+X_answer.drop(['RGYEAR','HY','ETYPE'], axis=1, inplace=True)
 
-X_train, X_test, y_train, y_test = train_test_split(
-        X_train, y_train, test_size=0.3, random_state=0)
-
-##Random Forest
-#forest = RandomForestClassifier(criterion='entropy',
-#                                n_estimators=20, 
-#                                random_state=0)
-#forest.fit(X_train, y_train)
-#clfScore(forest, X_test, y_test)
-
-#XGBOOST(Average 0.85)
-X_train = X_train.astype('float64')
-X_test = X_test.astype('float64')
-xlf = xgb.XGBRegressor(max_depth=4, 
-                        learning_rate=0.01, 
-                        n_estimators=50, 
-                        silent=True, 
-                        objective='binary:logistic', 
-                        nthread=-1, 
-                        gamma=0,
-                        min_child_weight=1, 
-                        max_delta_step=0, 
-                        subsample=0.85, 
-                        colsample_bytree=0.7, 
-                        colsample_bylevel=1, 
-                        reg_alpha=0, 
-                        reg_lambda=1, 
-                        scale_pos_weight=1, 
-                        seed=10, 
-                        missing=None)
-xlf.fit(X_train, y_train,
-        eval_metric='auc',
-        verbose = True,
-        eval_set = [(X_test, y_test)],
-        early_stopping_rounds=100)
-clfScore(xlf, X_test, y_test)
-pred = answer(xlf, X_answer, X_ID)
+X_train.to_pickle('X_train_from_entbase_pickle')
+X_answer.to_pickle('X_answer_from_entbase_pickle')
