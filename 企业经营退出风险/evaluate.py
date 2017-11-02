@@ -15,8 +15,8 @@ import xgboost as xgb
 
 from dankit import clfScore, answer
 
-X_train = pd.read_pickle('X_train_with_alter_pickle')
-X_answer = pd.read_pickle('X_answer_with_alter_pickle')
+X_train = pd.read_pickle('X_train_with_branch_pickle')
+X_answer = pd.read_pickle('X_answer_with_branch_pickle')
 
 y_train = X_train['TARGET']
 X_ID = X_answer['EID']

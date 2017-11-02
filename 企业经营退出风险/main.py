@@ -16,7 +16,6 @@ This is a temporary script file.
 import pandas as pd
 import seaborn as sns
 import numpy as np
-import matplotlib
 from sklearn.preprocessing import Imputer
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
@@ -30,9 +29,7 @@ import xgboost as xgb
 #
 from dankit import clfScore, answer
 
-entbase = pd.read_csv('1entbase.csv')
-alter = pd.read_csv('2alter.csv')
-branch = pd.read_csv('3branch.csv')
+entbase = pd.read_csv('1entbase 2.csv')
 X = pd.read_csv('train.csv')
 evaluation = pd.read_csv('evaluation_public.csv')
 

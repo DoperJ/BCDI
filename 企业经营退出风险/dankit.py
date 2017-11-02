@@ -12,6 +12,17 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
 from sklearn.decomposition import PCA
 
+def isExist(ser):
+    mask = [False if str(n) == "nan" else True for n in ser]
+    return np.array(mask, dtype=int)
+
+def splitDate(ser):
+    year_and_month = np.array([x.split('-') for x in ser])
+    return year_and_month[:, 0], year_and_month[:, 1]
+
+def addColumnsPrefix(df, prefix):
+    df.columns = list([prefix+str(x) for x in df.columns])
+
 def clfScore(clf, X_test, y_test):
     y_pred = clf.predict(X_test)
     y_pred = np.array([round(x) for x in y_pred])
@@ -49,9 +60,11 @@ def pca_ratio_curve(data, max_components, note_components=None):
     plt.show()
     return data_compressed
 
-def compress(data, n, prefix):
+def compress(data, n, prefix, keepEID=False):
     pca = PCA(n_components=n)
     data_compressed = pca.fit_transform(data)
     data_compressed_df = pd.DataFrame(data_compressed, 
                  columns=list([prefix+str(x) for x in range(1,pca.n_components_+1)]))
+    if keepEID:
+        data_compressed_df['EID'] = data.index
     return data_compressed_df
