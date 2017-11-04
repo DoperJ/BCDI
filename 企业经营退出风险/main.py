@@ -27,7 +27,7 @@ from sklearn.ensemble import RandomForestClassifier
 import xgboost as xgb
 
 #
-from dankit import clfScore, answer
+from dankit import clfScore, answer, addColumnsPrefix
 
 entbase = pd.read_csv('1entbase 2.csv')
 X = pd.read_csv('train.csv')
@@ -35,6 +35,10 @@ evaluation = pd.read_csv('evaluation_public.csv')
 
 #RGYEAR
 entbase['year_or_old'] = list([2000 if x <= 2000 else x for x in entbase['RGYEAR']])
+#year_dummies = pd.get_dummies(year_or_old)
+#addColumnsPrefix(year_dummies, 'base_year_')
+#year_dummies['EID'] = (entbase['EID']).values.reshape(-1,1)
+#entbase = pd.merge(entbase, year_dummies, how='left', on='EID')
 
 #HY
 hy_dummies = pd.get_dummies(entbase['HY'])

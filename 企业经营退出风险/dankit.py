@@ -16,12 +16,24 @@ def isExist(ser):
     mask = [False if str(n) == "nan" else True for n in ser]
     return np.array(mask, dtype=int)
 
-def splitDate(ser):
-    year_and_month = np.array([x.split('-') for x in ser])
+def splitDate(ser, delimiter='-'):
+    year_and_month = np.array([x.split(delimiter) for x in ser])
     return year_and_month[:, 0], year_and_month[:, 1]
 
 def addColumnsPrefix(df, prefix):
     df.columns = list([prefix+str(x) for x in df.columns])
+
+def getDateDummies(year, month, year_name, month_name, index):
+    year_dummies = pd.get_dummies(year)
+    month_dummies = pd.get_dummies(month)
+    addColumnsPrefix(year_dummies, year_name)
+    addColumnsPrefix(month_dummies, month_name)
+    #将年份与月份合并为一个DataFrame
+    date_dummies = year_dummies.join(month_dummies)
+    date_dummies['EID'] = index
+    date_dummies = date_dummies.groupby('EID').sum()
+    date_dummies.reset_index(inplace=True)
+    return date_dummies
 
 def clfScore(clf, X_test, y_test):
     y_pred = clf.predict(X_test)

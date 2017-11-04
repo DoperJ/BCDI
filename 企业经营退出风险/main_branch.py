@@ -41,7 +41,7 @@ end_year_dummies = end_year_dummies.groupby('EID').sum()
 
 
 #绘制pca压缩后保留数据百分比的曲线，确定压缩维度
-pca_ratio_curve(re_year_dummies, 20, 4)
+#pca_ratio_curve(re_year_dummies, 20, 4)
 re_year_compressed_df = compress(re_year_dummies, 4, 're_year')
 re_year_dummies.reset_index(inplace=True)
 re_year_compressed_df['EID'] = re_year_dummies['EID']
