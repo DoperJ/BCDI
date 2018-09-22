@@ -1,4 +1,5 @@
-# A Data Mining Contest in My Senior Year
+# A Data Mining Contest 
+####in My Senior Year
 
 *Low Ranking && Junk Codes*
 
